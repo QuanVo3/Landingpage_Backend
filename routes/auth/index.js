@@ -8,9 +8,9 @@ const router = express.Router();
 
 // Đăng ký admin
 router.post("/register", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
   const hashed = await bcrypt.hash(password, 10);
-  const user = new User({ username, password: hashed });
+  const user = new User({ username, email, password: hashed });
   await user.save();
   res.json({ message: "Admin registered" });
 });
