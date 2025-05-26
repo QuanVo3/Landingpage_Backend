@@ -14,7 +14,7 @@ const app = express();
 // ⚠️ Cấu hình CORS cho phép frontend (Next.js) truy cập
 app.use(
   cors({
-    origin: "http://localhost:3000", // Thay bằng domain frontend thật nếu deploy
+    origin: "https://meteoviet.org/", // Thay bằng domain frontend thật nếu deploy
     credentials: true, // Bắt buộc nếu bạn dùng cookie, session, hoặc token
   })
 );
