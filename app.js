@@ -11,26 +11,13 @@ const articleRoutes = require("./routes/article");
 // Tạo app
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3000", // Cho phép frontend dev
-  "https://meteoviet.org", // Cho phép gọi trực tiếp từ production
-  "https://meteoviet.vn", // Cho phép gọi trực tiếp từ frontend production
-];
-
+// ⚠️ Cấu hình CORS cho phép frontend (Next.js) truy cập
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS: " + origin));
-      }
-    },
+    origin: "http://localhost:3000/", // Thay bằng domain frontend thật nếu deploy
+    credentials: true, // Bắt buộc nếu bạn dùng cookie, session, hoặc token
   })
 );
-
-// Cho phép preflight request (OPTIONS)
-app.options("*", cors());
 
 // Tăng giới hạn body size
 app.use(express.json({ limit: "10mb" }));
