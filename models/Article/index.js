@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const articleSchema = new mongoose.Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
+  thumbnail: { type: String, required: true },
+  slug: { type: String, required: true },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",

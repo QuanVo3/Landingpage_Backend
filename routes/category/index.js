@@ -13,14 +13,14 @@ router.get("/", async (req, res) => {
 // POST tạo mới danh mục
 router.post("/", verifyToken, async (req, res) => {
   try {
-    const { name } = req.body;
-    const newCategory = new Category({ name });
+    const { name, slug } = req.body;
+    const newCategory = new Category({ name, slug });
     await newCategory.save();
     res.status(201).json(newCategory);
   } catch (err) {
     res
       .status(400)
-      .json({ error: "Tên danh mục đã tồn tại hoặc không hợp lệ." });
+      .json({ error: "Tên danh mục đã tồn tại hoặc không hợp lệ.", err });
   }
 });
 
@@ -40,12 +40,23 @@ router.put("/:id", verifyToken, async (req, res) => {
 });
 
 // DELETE xóa danh mục
-router.delete("/:id", verifyToken, async (req, res) => {
+router.delete("/", verifyToken, async (req, res) => {
+  const { ids } = req.body;
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "Danh sách ID không hợp lệ." });
+  }
+
   try {
-    await Category.findByIdAndDelete(req.params.id);
-    res.json({ message: "Đã xóa danh mục" });
+    const result = await Category.deleteMany({ _id: { $in: ids } });
+
+    res.json({
+      message: `Đã xóa ${result.deletedCount} danh mục`,
+      deletedCount: result.deletedCount,
+    });
   } catch (err) {
-    res.status(400).json({ error: "Không thể xóa danh mục." });
+    console.error("Lỗi xóa hàng loạt:", err);
+    res.status(500).json({ error: "Không thể xóa danh mục." });
   }
 });
 

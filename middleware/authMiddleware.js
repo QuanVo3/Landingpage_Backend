@@ -10,9 +10,10 @@ const verifyToken = (req, res, next) => {
       req.user = decoded; // lưu info user vào req
       next();
     } catch (err) {
-      return res
-        .status(403)
-        .json({ error: "Token không hợp lệ hoặc đã hết hạn." });
+      if (err.name === "TokenExpiredError") {
+        return res.status(403).json({ error: "Token đã hết hạn." });
+      }
+      return res.status(403).json({ error: "Token không hợp lệ." });
     }
   } else {
     return res

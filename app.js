@@ -11,7 +11,10 @@ const articleRoutes = require("./routes/article");
 // Tạo app
 const app = express();
 app.use(cors());
-app.use(express.json());
+
+// Tăng giới hạn body size lên ví dụ 10MB
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 // Sử dụng routes
 app.use("/api/auth", authRoutes);
