@@ -1,5 +1,6 @@
 const express = require("express");
 const MiniAppOptions = require("../../models/MiniAppOptions");
+const verifyToken = require("../../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.get("/", async (req, res) => {
 });
 
 //Put MiniAppOptions
-router.put("/", async (req, res) => {
+router.put("/", verifyToken, async (req, res) => {
     try {
         const updatedOptions = await MiniAppOptions.findOneAndUpdate(
             {},
@@ -35,7 +36,7 @@ router.put("/", async (req, res) => {
 });
 
 //Post MiniAppOptions
-router.post("/init", async (req, res) => {
+router.post("/init", verifyToken, async (req, res) => {
     try {
         const existing = await MiniAppOptions.findOne();
         if (existing) {
