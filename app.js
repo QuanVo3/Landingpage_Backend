@@ -13,7 +13,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000/api",
     credentials: true,
   })
 );
@@ -27,4 +27,9 @@ app.use("/api/categories", categoryRoutes);
 // Kết nối MongoDB và khởi động server
 mongoose
   .connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log(`✅ Server is running on port ${process.env.PORT}`);
+    });
+  })
   .catch((err) => console.error("MongoDB connection error:", err));
