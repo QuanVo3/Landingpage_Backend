@@ -11,12 +11,12 @@ const articleRoutes = require("./routes/article");
 // Tạo app
 const app = express();
 
-const corsOptions = {
-  origin: "http://localhost:3000",
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // Sử dụng routes
@@ -27,9 +27,4 @@ app.use("/api/categories", categoryRoutes);
 // Kết nối MongoDB và khởi động server
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log(`✅ Server is running on port ${process.env.PORT}`);
-    });
-  })
   .catch((err) => console.error("MongoDB connection error:", err));
