@@ -4,35 +4,61 @@ const verifyToken = require("../../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Lấy tất cả bài viết
+// GET: Lấy tất cả bài viết (có phân trang)
 router.get("/", async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
   try {
-    const articles = await Article.find().populate({
-      path: "category",
-      select: "name", // chỉ lấy trường name của danh mục
+    const articles = await Article.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate({ path: "category", select: "name" });
+
+    const total = await Article.countDocuments();
+
+    res.json({
+      articles,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
     });
-    res.json(articles);
   } catch (err) {
-    res.status(500).json({ error: "Lỗi khi lấy tất cả bài viết." });
+    res.status(500).json({ error: "Lỗi khi lấy danh sách bài viết." });
   }
 });
 
-// Lấy tất cả bài viết theo danh mục
+// GET: Bài viết theo danh mục
 router.get("/category/:categoryId", async (req, res) => {
   try {
-    const articles = await Article.find({
-      category: req.params.categoryId,
-    }).populate({
-      path: "category",
-      select: "name", // chỉ lấy trường name của danh mục
-    });
+    const articles = await Article.find({ category: req.params.categoryId })
+      .sort({ createdAt: -1 })
+      .populate({ path: "category", select: "name" });
+
     res.json(articles);
   } catch (err) {
-    res.status(500).json({ error: "Lỗi khi lấy bài viết." });
+    res.status(500).json({ error: "Lỗi khi lấy bài viết theo danh mục." });
   }
 });
 
-// Tạo mới bài viết
+// GET: Bài viết theo slug
+router.get("/slug/:slug", async (req, res) => {
+  try {
+    const article = await Article.findOne({ slug: req.params.slug }).populate(
+      "category",
+      "name"
+    );
+    if (!article)
+      return res.status(404).json({ error: "Không tìm thấy bài viết." });
+    res.json(article);
+  } catch (err) {
+    res.status(500).json({ error: "Lỗi khi lấy bài viết theo slug." });
+  }
+});
+
+// POST: Tạo mới bài viết
 router.post("/", verifyToken, async (req, res) => {
   const { title, content, category, author, thumbnail, slug } = req.body;
 
@@ -41,6 +67,11 @@ router.post("/", verifyToken, async (req, res) => {
   }
 
   try {
+    const existing = await Article.findOne({ slug });
+    if (existing) {
+      return res.status(409).json({ error: "Slug đã tồn tại." });
+    }
+
     const newArticle = new Article({
       title,
       content,
@@ -50,6 +81,7 @@ router.post("/", verifyToken, async (req, res) => {
       slug,
     });
     await newArticle.save();
+
     res.status(201).json(newArticle);
   } catch (err) {
     console.error("Lỗi khi tạo bài viết:", err);
@@ -57,27 +89,34 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// Sửa bài viết
+// PUT: Cập nhật bài viết
 router.put("/:id", verifyToken, async (req, res) => {
-  const { title, content, category, author } = req.body;
+  const { title, content, category, author, thumbnail, slug } = req.body;
 
-  if (!title || !content || !category || !author) {
+  if (!title || !content || !category || !author || !slug) {
     return res.status(400).json({ error: "Thiếu thông tin cần thiết." });
   }
 
   try {
-    const updatedArticle = await Article.findByIdAndUpdate(
+    const updated = await Article.findByIdAndUpdate(
       req.params.id,
-      { title, content, category, author },
+      { title, content, category, author, thumbnail, slug },
       { new: true }
     );
-    res.json(updatedArticle);
+
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ error: "Không tìm thấy bài viết để cập nhật." });
+    }
+
+    res.json(updated);
   } catch (err) {
-    res.status(500).json({ error: "Lỗi khi sửa bài viết." });
+    res.status(500).json({ error: "Lỗi khi cập nhật bài viết." });
   }
 });
 
-// Xóa bài viết
+// DELETE: Xóa nhiều bài viết
 router.delete("/", verifyToken, async (req, res) => {
   const { ids } = req.body;
 
@@ -86,8 +125,8 @@ router.delete("/", verifyToken, async (req, res) => {
   }
 
   try {
-    await Article.deleteMany({ _id: { $in: ids } });
-    res.json({ message: `Xóa thành công` });
+    const result = await Article.deleteMany({ _id: { $in: ids } });
+    res.json({ message: `Đã xóa ${result.deletedCount} bài viết.` });
   } catch (err) {
     res.status(500).json({ error: "Lỗi khi xóa bài viết." });
   }
