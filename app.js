@@ -4,16 +4,16 @@ const cors = require("cors");
 require("dotenv").config();
 
 // Import routes
-const authRoutes = require("./routes/auth");
-const categoryRoutes = require("./routes/category");
-const articleRoutes = require("./routes/article");
+const authRoutes = require("./routes/auth/index");
+const categoryRoutes = require("./routes/category/index");
+const articleRoutes = require("./routes/article/index");
 
 // Tạo app
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000/api",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
