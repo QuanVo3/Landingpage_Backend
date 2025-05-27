@@ -1,6 +1,7 @@
 const express = require("express");
 const Category = require("../../models/Category");
 const verifyToken = require("../../middleware/authMiddleware");
+const Article = require("../../models/Article");
 
 const router = express.Router();
 
@@ -48,11 +49,11 @@ router.delete("/", verifyToken, async (req, res) => {
   }
 
   try {
-    const result = await Category.deleteMany({ _id: { $in: ids } });
+    await Article.deleteMany({ category: { $in: ids } });
+    await Category.deleteMany({ _id: { $in: ids } });
 
     res.json({
-      message: `Đã xóa ${result.deletedCount} danh mục`,
-      deletedCount: result.deletedCount,
+      message: `Xóa thành công`,
     });
   } catch (err) {
     console.error("Lỗi xóa hàng loạt:", err);
