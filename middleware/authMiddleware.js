@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const verifyToken = (req, res, next) => {
   if (req.method === "OPTIONS") {
     // Cho phép preflight request đi qua mà không kiểm tra token
@@ -24,3 +25,4 @@ const verifyToken = (req, res, next) => {
       .json({ error: "Bạn chưa đăng nhập hoặc thiếu token." });
   }
 };
+module.exports = verifyToken;
