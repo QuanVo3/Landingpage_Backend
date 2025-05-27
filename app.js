@@ -4,9 +4,10 @@ const cors = require("cors");
 require("dotenv").config();
 
 // Import routes
-const authRoutes = require("./routes/auth/index");
-const categoryRoutes = require("./routes/category/index");
-const articleRoutes = require("./routes/article/index");
+const authRoutes = require("./routes/Auth/index");
+const categoryRoutes = require("./routes/Category/index");
+const articleRoutes = require("./routes/Article/index");
+const miniAppOptionsRoutes = require("./routes/MiniAppOptions/index");
 
 // Tạo app
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/mini-app-options", miniAppOptionsRoutes);
 
 // Kết nối MongoDB và khởi động server
 mongoose
