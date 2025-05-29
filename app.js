@@ -12,27 +12,7 @@ const miniAppOptionsRoutes = require("./routes/MiniAppOptions/index");
 // Tạo app
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://zalo.me", // hoặc domain chính xác nơi Zalo mini app chạy
-  "https://yourfrontenddomain.com", // domain frontend thực tế
-];
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // cho request không có origin (ví dụ mobile app)
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 // Sử dụng routes
