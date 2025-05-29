@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
 });
 
 //Put MiniAppOptions
-router.patch("/", verifyToken, async (req, res) => {
+router.post("/", verifyToken, async (req, res) => {
   const { showFacebook, showYouTube, showIntroduction } = req.body;
   try {
     const updatedOptions = await MiniAppOptions.findOneAndUpdate(
