@@ -28,8 +28,6 @@ mongoose
   .connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    keepAlive: true,
-    keepAliveInitialDelay: 300000,
   })
   .then(() => {
     // ✅ Cron job mỗi 5 phút
