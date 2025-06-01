@@ -31,7 +31,7 @@ mongoose
   })
   .then(() => {
     // ✅ Cron job mỗi 5 phút
-    cron.schedule("*/5 * * * *", pingMongoDB);
+    cron.schedule("*/2 * * * *", pingMongoDB);
 
     // Khởi động server
     app.listen(process.env.PORT, () => {
