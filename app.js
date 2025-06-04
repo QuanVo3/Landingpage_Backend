@@ -15,9 +15,12 @@ const miniAppOptionsRoutes = require("./routes/MiniAppOptions/index");
 // Tạo app
 const app = express();
 
+// Cấu hình middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ limit: "2mb", extended: true }));
 
+// Khai báo routes
 app.use("/api/auth", authRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -30,7 +33,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    // ✅ Cron job mỗi 5 phút
+    // Cron job mỗi 2 phút
     cron.schedule("*/2 * * * *", pingMongoDB);
 
     // Khởi động server
