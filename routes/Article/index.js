@@ -4,15 +4,14 @@ const verifyToken = require("../../middleware/authMiddleware");
 
 const router = express.Router();
 
-// GET: Lấy tất cả bài viết (có phân trang)
+// GET: Lấy tất cả bài viết (phân trang bằng limit & offset)
 router.get("/", async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  const offset = parseInt(req.query.offset) || 0;
 
   try {
     const articles = await Article.find()
-      .skip(skip)
+      .skip(offset)
       .limit(limit)
       .sort({ createdAt: -1 })
       .populate({ path: "category", select: "name" });
@@ -22,7 +21,7 @@ router.get("/", async (req, res) => {
     res.json({
       articles,
       total,
-      page,
+      offset,
       totalPages: Math.ceil(total / limit),
     });
   } catch (err) {
@@ -30,17 +29,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET: Bài viết theo danh mục
-// GET: Bài viết theo danh mục (có phân trang)
+// GET: Bài viết theo danh mục (phân trang bằng limit & offset)
 router.get("/category/:categoryId", async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
+  const offset = parseInt(req.query.offset) || 0;
 
   try {
     const [articles, total] = await Promise.all([
       Article.find({ category: req.params.categoryId })
-        .skip(skip)
+        .skip(offset)
         .limit(limit)
         .sort({ createdAt: -1 })
         .populate({ path: "category", select: "name" }),
@@ -50,7 +47,7 @@ router.get("/category/:categoryId", async (req, res) => {
     res.json({
       articles,
       total,
-      page,
+      offset,
       totalPages: Math.ceil(total / limit),
     });
   } catch (err) {
