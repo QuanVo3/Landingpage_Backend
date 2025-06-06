@@ -31,13 +31,28 @@ router.get("/", async (req, res) => {
 });
 
 // GET: Bài viết theo danh mục
+// GET: Bài viết theo danh mục (có phân trang)
 router.get("/category/:categoryId", async (req, res) => {
-  try {
-    const articles = await Article.find({ category: req.params.categoryId })
-      .sort({ createdAt: -1 })
-      .populate({ path: "category", select: "name" });
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
 
-    res.json(articles);
+  try {
+    const [articles, total] = await Promise.all([
+      Article.find({ category: req.params.categoryId })
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .populate({ path: "category", select: "name" }),
+      Article.countDocuments({ category: req.params.categoryId }),
+    ]);
+
+    res.json({
+      articles,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
     res.status(500).json({ error: "Lỗi khi lấy bài viết theo danh mục." });
   }
