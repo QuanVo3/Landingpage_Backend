@@ -17,7 +17,7 @@ datasource db {
 model Article {
  id       String   @id @default(uuid()) @map("id") 
   title      String
-  content    String
+  content String @db.Text
   thumbnail  String
   slug       String   @unique
   category   Category @relation(fields: [categoryId], references: [id]) //Category ánh xạ tới model Category ở dưới và lấy dữ liệu ở cột id
@@ -49,14 +49,3 @@ model MiniAppOptions {
   @@map("mini_app_options")
 }
 
-model User {
- id      String   @id @default(uuid()) @map("id")
-  username  String   @unique
-  email     String   @unique
-  password  String
-  avatar    String?  // optional field
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("users") // Chỗ này a đổi tên bảng theo bảng trong db nha
-}
