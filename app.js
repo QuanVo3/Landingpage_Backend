@@ -1,12 +1,8 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const cron = require("node-cron");
 require("dotenv").config();
 
-const pingMongoDB = require("./cron/mongoPing");
-
-// Import routes
+// Import routes (đã dùng Prisma trong route rồi)
 const authRoutes = require("./routes/Auth/index");
 const categoryRoutes = require("./routes/Category/index");
 const articleRoutes = require("./routes/Article/index");
@@ -26,19 +22,7 @@ app.use("/api/articles", articleRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/mini-app-options", miniAppOptionsRoutes);
 
-// Kết nối MongoDB và khởi động server
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    // Cron job mỗi 2 phút
-    cron.schedule("*/2 * * * *", pingMongoDB);
-
-    // Khởi động server
-    app.listen(process.env.PORT, () => {
-      console.log(`🚀 Server is running on port ${process.env.PORT}`);
-    });
-  })
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+// Khởi động server (Prisma không cần connect thủ công ở đây)
+app.listen(process.env.PORT, () => {
+  console.log(`🚀 Server is running on port ${process.env.PORT}`);
+});
