@@ -2,6 +2,7 @@ const express = require("express");
 const Category = require("../../models/Category");
 const verifyToken = require("../../middleware/authMiddleware");
 const Article = require("../../models/Article");
+const axios = require("axios");
 
 const router = express.Router();
 
@@ -15,9 +16,13 @@ router.get("/", async (req, res) => {
 router.post("/", verifyToken, async (req, res) => {
   try {
     const { name, slug } = req.body;
-    const newCategory = new Category({ name, slug });
-    await newCategory.save();
-    res.status(201).json(newCategory);
+    await axios.post("https://devopslab.io.vn/api/categories/", {
+      name: name,
+      slug: slug,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    res.status(201).json({ message: "Tạo danh mục thành công" });
   } catch (err) {
     res
       .status(400)
@@ -28,36 +33,32 @@ router.post("/", verifyToken, async (req, res) => {
 // PUT cập nhật danh mục
 router.put("/:id", verifyToken, async (req, res) => {
   try {
-    const { name } = req.body;
-    const updated = await Category.findByIdAndUpdate(
-      req.params.id,
-      { name },
-      { new: true }
+    const { name, slug } = req.body;
+    await axios.put(
+      `https://devopslab.io.vn/api/categories/${req.params.id}/`,
+      {
+        name: name,
+        slug: slug,
+        updatedAt: new Date().toISOString(),
+      }
     );
-    res.json(updated);
+    res.status(201).json({ message: "Sửa danh mục thành công" });
   } catch (err) {
-    res.status(400).json({ error: "Không thể cập nhật danh mục." });
+    res
+      .status(400)
+      .json({ error: "Tên danh mục đã tồn tại hoặc không hợp lệ.", err });
   }
 });
 
 // DELETE xóa danh mục
-router.delete("/", verifyToken, async (req, res) => {
-  const { ids } = req.body;
-
-  if (!Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ error: "Danh sách ID không hợp lệ." });
-  }
-
+router.delete("/:id", verifyToken, async (req, res) => {
   try {
-    await Article.deleteMany({ category: { $in: ids } });
-    await Category.deleteMany({ _id: { $in: ids } });
-
-    res.json({
-      message: `Xóa thành công`,
-    });
+    await axios.delete(
+      `https://devopslab.io.vn/api/categories/${req.params.id}/`
+    );
+    res.status(201).json({ message: "Xóa danh mục thành công" });
   } catch (err) {
-    console.error("Lỗi xóa hàng loạt:", err);
-    res.status(500).json({ error: "Không thể xóa danh mục." });
+    res.status(400).json({ error: "Xóa danh mục thất bại", err });
   }
 });
 

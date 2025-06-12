@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Article {
+  id         String   @id @default(uuid()) @map("id")
+  title      String
+  content    String
+  thumbnail  String
+  slug       String   @unique
+  category   Category @relation(fields: [categoryId], references: [id]) //Category ánh xạ tới model Category ở dưới và lấy dữ liệu ở cột id
+  categoryId String
+  author     String
+  createdAt  DateTime @default(now())
+
+  @@map("articles") // tên bảng trong MySQL là articles
+}
+
+model Category {
+  id        String   @id @default(uuid()) @map("id")
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles Article[] // Quan hệ 1-n với bảng Article (nếu cần)
+
+  @@map("categories") // Đặt tên bảng theo chuẩn
+}
+
+model MiniAppOptions {
+  id               String  @id @default(uuid()) @map("id")
+  showFacebook     Boolean @default(false)
+  showYouTube      Boolean @default(false)
+  showIntroduction Boolean @default(false)
+
+  @@map("mini_app_options")
+}
+
+model User {
+  id        String   @id @default(uuid()) @map("id")
+  username  String   @unique
+  email     String   @unique
+  password  String
+  avatar    String? // optional field
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users") // Chỗ này a đổi tên bảng theo bảng trong db nha
+}
