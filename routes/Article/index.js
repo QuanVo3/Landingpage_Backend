@@ -5,6 +5,32 @@ const axios = require("axios");
 
 const router = express.Router();
 
+router.get("/", async (req, res) => {
+  try {
+    const response = await axios.get("https://devopslab.io.vn/api/articles/");
+    res.json({ articles: response.data });
+  } catch (err) {
+    res.status(400).json({
+      error: "Lấy bài viết thất bại!",
+      err: err.response?.data || err.message,
+    });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `https://devopslab.io.vn/api/articles/category/${req.params.id}/`
+    );
+    res.json({ articles: response.data });
+  } catch (err) {
+    res.status(400).json({
+      error: "Lấy bài viết thất bại!",
+      err: err.response?.data || err.message,
+    });
+  }
+});
+
 // POST: Tạo mới bài viết
 router.post("/", verifyToken, async (req, res) => {
   const { title, content, category, author, thumbnail, slug, createdAt } =
