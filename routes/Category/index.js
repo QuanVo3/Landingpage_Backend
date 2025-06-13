@@ -8,8 +8,15 @@ const router = express.Router();
 
 // GET tất cả danh mục
 router.get("/", async (req, res) => {
-  const categories = await Category.find().sort({ createdAt: -1 });
-  res.json(categories);
+  try {
+    const response = await axios.get("https://devopslab.io.vn/api/categories");
+    res.json(response.data);
+  } catch (err) {
+    res.status(400).json({
+      error: "Lấy danh mục bài viết thất bại!",
+      err: err.response?.data || err.message,
+    });
+  }
 });
 
 // POST tạo mới danh mục

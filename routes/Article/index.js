@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/category/:id", async (req, res) => {
   try {
     const response = await axios.get(
       `https://devopslab.io.vn/api/articles/category/${req.params.id}/`
