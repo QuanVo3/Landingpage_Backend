@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
     const modifiedData = response.data.map((item) => ({
       ...item,
       _id: item.id,
-      id: undefined, // Xóa trường cũ nếu cần
+      id: item.id, // Xóa trường cũ nếu cần
     }));
 
     res.json(modifiedData);
