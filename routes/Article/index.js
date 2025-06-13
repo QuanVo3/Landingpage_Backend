@@ -22,7 +22,7 @@ router.get("/category/:id", async (req, res) => {
     const response = await axios.get(
       `https://devopslab.io.vn/api/articles/category/${req.params.id}/`
     );
-    res.json({ articles: response.data });
+    res.json(response.data);
   } catch (err) {
     res.status(400).json({
       error: "Lấy bài viết thất bại!",
