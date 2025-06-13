@@ -10,7 +10,15 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const response = await axios.get("https://devopslab.io.vn/api/categories");
-    res.json(response.data);
+
+    // Chuyển đổi id thành _id
+    const modifiedData = response.data.map((item) => ({
+      ...item,
+      _id: item.id,
+      id: undefined, // Xóa trường cũ nếu cần
+    }));
+
+    res.json(modifiedData);
   } catch (err) {
     res.status(400).json({
       error: "Lấy danh mục bài viết thất bại!",
